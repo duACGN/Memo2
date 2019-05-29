@@ -1,11 +1,15 @@
 package com.example.root.memo2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -16,6 +20,13 @@ import java.util.List;
 public class MemoListFragment extends Fragment{
     private RecyclerView mMemoRecyclerView;
     private MemoAdapter mAdapter;
+    private FloatingActionButton mButton;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -24,17 +35,45 @@ public class MemoListFragment extends Fragment{
         mMemoRecyclerView = (RecyclerView)view.findViewById(R.id.memo_recycler_view);
         mMemoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        updateUI();
 
+        mButton = (FloatingActionButton)view.findViewById(R.id.fab);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MemoOne memoOne = new MemoOne();
+                MemoLab.addMemoOne(memoOne);
+                Intent intent = MemoActivity.newIntent(getActivity(), memoOne.getId());
+                startActivity(intent);
+//                updateUI();
+            }
+        });
+
+        updateUI();
         return view;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        updateUI();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
     }
 
     private void updateUI(){
         MemoLab memoLab = MemoLab.get(getActivity());
         List<MemoOne> memoOnes = memoLab.getMemoOnes();
 
-        mAdapter = new MemoAdapter(memoOnes);
-        mMemoRecyclerView.setAdapter(mAdapter);
+        if(mAdapter == null){
+            mAdapter = new MemoAdapter(memoOnes);
+            mMemoRecyclerView.setAdapter(mAdapter);
+        }else {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     private class MemoHolder extends RecyclerView.ViewHolder
@@ -60,9 +99,11 @@ public class MemoListFragment extends Fragment{
 
         @Override
         public void onClick(View view){
-            Toast.makeText(getActivity(),
-                    mMemoOne.getTitle() + " clicked!", Toast.LENGTH_SHORT)
-                    .show();
+//            Toast.makeText(getActivity(),
+//                    mMemoOne.getTitle() + " clicked!", Toast.LENGTH_SHORT)
+//                    .show();
+            Intent intent = MemoActivity.newIntent(getActivity(), mMemoOne.getId());
+            startActivity(intent);
         }
     }
 

@@ -9,6 +9,16 @@ public class MemoOne {
     private Date mDate;
     private boolean mSolved;
 
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text;
+    }
+
+    private String mText;
+
     public MemoOne() {
         mId = UUID.randomUUID();
         mDate = new Date();
